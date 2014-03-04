@@ -9,7 +9,12 @@ abstract class Entity {
 		if(!empty($data)) $this->setData($data);
 	}
 
-	public function setData($data) {
+	/**
+	 * Sets the data of this object
+	 *
+	 * @param array $data
+	 */
+	public function setData(array $data) {
 		foreach($data as $key => $value) {
 			if(!is_array($value)) {
 				$this->{$key} = $value;
@@ -70,10 +75,12 @@ abstract class Entity {
 			case 'unit_members':
 				$object = new Person();
 				break;
+			case 'PersonAttribute':
+			case 'PersonAttributes':
+				$object = new PersonAttribute();
+				break;
 			default:
-
 				throw new \InvalidResponseException('\'' . $key . '\' is not a known object name');
-
 		}
 
 		return $object;
