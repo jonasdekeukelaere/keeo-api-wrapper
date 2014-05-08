@@ -3,12 +3,16 @@
 require_once('keeo.php');
 $keeo = new Keeo();
 
+
 // check credentials
 try {
 	$isLoggedIn = $keeo->userLogin('2014000217', 'test123'); // username, password (unencrypted)
 } catch (CredentialsDoNotMatchException $e) {
 	// username and/or password are incorrect
 }
+
+// check if a person exists
+$results = $keeo->findUser('John', 'Doe', 'john.doe@fos.be', '1992-04-23');
 
 // get a person
 $person = $keeo->getPerson('2013000708'); // stemnumber

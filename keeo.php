@@ -104,6 +104,54 @@ class Keeo {
 	}
 
 	/**
+	 * Checks if a user exists with the given attributes
+	 *
+	 * @param string $firstName
+	 * @param string $name
+	 * @param string $email
+	 * @param string $birthDate		Format: Y-m-d, ex: 2011-06-28
+	 * @return array
+	 * @throws InvalidArgumentException
+	 */
+	public function findUser($firstName = '', $name = '', $email = '', $birthDate='') {
+		$connector = new KeeoConnector();
+		$foundUsers = array();
+
+		// build search params
+		$searchParams = array();
+		if(!empty($firstName)){
+			$searchParams['first_name'] = $firstName;
+		}
+		if(!empty($name)){
+			$searchParams['name'] = $name;
+		}
+		if(!empty($email)){
+			$searchParams['email'] = $email;
+		}
+		if(!empty($birthDate)){
+			$birthDateObj = DateTime::createFromFormat('Y-m-d', $birthDate);
+
+			if($birthDateObj->format('Y-m-d') == $birthDate) {
+				$searchParams['birth_date'] = $birthDate;
+			} else {
+				throw new InvalidArgumentException('Please provide the birthDate in the Y-m-d format');
+			}
+		}
+
+		if(!empty($searchParams)) {
+			$response = $connector->post('/person/verify.json', $searchParams);
+
+			if($response->headers['Status-Code'] == '200') {
+				$foundUsers = json_decode($response->body);
+			}
+		} else {
+			throw new InvalidArgumentException('At least one search parameter needs to be given.');
+		}
+
+		return $foundUsers;
+	}
+
+	/**
 	 * Get a unit from Keeo
 	 *
 	 * @param $unitNumber
