@@ -3,7 +3,6 @@
 require_once('keeo.php');
 $keeo = new Keeo();
 
-
 // check credentials
 try {
 	$isLoggedIn = $keeo->userLogin('2014000217', 'test123'); // username, password (unencrypted)
@@ -25,3 +24,6 @@ $unitNumbers = $keeo->getAllUnitNumbers();
 
 // get all persons within an unit
 $members = $keeo->getAllMembersInUnit('500'); // unitnumber
+
+// get the number of persons within a unit
+$numberOfPersons = $keeo->getNumberOfPersonsInUnit('500'); // unitnumber

@@ -170,6 +170,26 @@ class Keeo {
 		return new \Keeo\Entity\Unit($unitData);
 	}
 
+	public function getNumberOfPersonsInUnit($unitNumber, $functionNumber = null) {
+		$connector = new KeeoConnector();
+
+		$params = array(
+			'number' => $unitNumber
+		);
+		if(!empty($functionNumber)) $params['function_number'] = $functionNumber;
+
+		$response = $connector->post('/unit/search-member-count.json', $params);
+		$responseBody = json_decode($response->body, true);
+
+		if(isset($responseBody['count'])) {
+			$numberOfPersons = (int) $responseBody['count'];
+		} else {
+			throw new InvalidResponseException("Expected key 'count' not found in the response body");
+		}
+
+		return $numberOfPersons;
+	}
+
 	/**
 	 * Get all members in a unit
 	 *
