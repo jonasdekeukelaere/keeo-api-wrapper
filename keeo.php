@@ -276,4 +276,20 @@ class Keeo {
 		return $unitNumbers;
 	}
 
+
+	/**
+	 * Gets the event categories
+	 *
+	 * @return array
+	 */
+	public function getEventCategories() {
+		$connector = new KeeoConnector();
+
+		$response = $connector->get('/event/categories.json');
+		$categories = json_decode($response->body, true);
+
+		return $categories;
+	}
+
+
 }

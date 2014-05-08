@@ -27,3 +27,6 @@ $members = $keeo->getAllMembersInUnit('500'); // unitnumber
 
 // get the number of persons within a unit
 $numberOfPersons = $keeo->getNumberOfPersonsInUnit('500'); // unitnumber
+
+// get the event categories
+$categories = $this->getEventCategories();
