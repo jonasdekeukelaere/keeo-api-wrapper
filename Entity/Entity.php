@@ -16,11 +16,13 @@ abstract class Entity {
 	 */
 	public function setData(array $data) {
 		foreach($data as $key => $value) {
+			$propertyName = strtolower($key);
+
 			if(!is_array($value)) {
-				$this->{$key} = $value;
+				$this->{$propertyName} = $value;
 			} elseif($this->isArrayAnObject($value)) {
-				$this->{$key} = $this->getObjectOfKey($key);
-				$this->{$key}->setData($value);
+				$this->{$propertyName} = $this->getObjectOfKey($key);
+				$this->{$propertyName}->setData($value);
 			} else {
 				$objects = array();
 				foreach($value as $possibleObject) {
@@ -30,7 +32,7 @@ abstract class Entity {
 						$objects[] = $object;
 					}
 				}
-				$this->{$key} = $objects;
+				$this->{$propertyName} = $objects;
 			}
 		}
 	}
