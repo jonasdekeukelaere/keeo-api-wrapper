@@ -4,7 +4,10 @@
 require_once('Exceptions.php');
 require_once('KeeoConnector.php');
 require_once('Entity/Entity.php');
+require_once('Entity/Event.php');
 require_once('Entity/EventCategory.php');
+require_once('Entity/EventSubscriptionStatus.php');
+require_once('Entity/EventVisibility.php');
 require_once('Entity/Address.php');
 require_once('Entity/Person.php');
 require_once('Entity/PersonAttribute.php');
@@ -356,5 +359,18 @@ class Keeo
         }
 
         return $foundEvents;
+    }
+
+    public function getEvent($eventCode)
+    {
+        $connector = new KeeoConnector();
+
+        $response = $connector->get('/event/' . $eventCode . '.json');
+        $eventData = json_decode($response->body, true);
+
+        if(isset($eventData['event'])) $eventData = $eventData['event'];
+        else throw new InvalidResponseException();
+
+        return new \Keeo\Entity\Event($eventData);
     }
 }

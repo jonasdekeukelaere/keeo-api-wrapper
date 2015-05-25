@@ -84,6 +84,16 @@ abstract class Entity {
             case 'event_categories':
                 $object = new EventCategory();
                 break;
+            case 'SubscriptionStatus':
+                $object = new EventSubscriptionStatus();
+                break;
+            case 'EventVisibility':
+                $object = new EventVisibility();
+                break;
+            case 'PriceCategory':
+            case 'PriceCategories':
+                $object = new PriceCategory();
+                break;
 			default:
 				throw new \InvalidResponseException('\'' . $key . '\' is not a known object name');
 		}

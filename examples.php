@@ -39,3 +39,5 @@ $events = $keeo->findEvents(
     DateTime::createFromFormat('Y-m-d', '2015-05-01'),  // end date from
     DateTime::createFromFormat('Y-m-d', '2015-05-31')   // end date until
 );
+
+$event = $keeo->getEvent('SD2014');
