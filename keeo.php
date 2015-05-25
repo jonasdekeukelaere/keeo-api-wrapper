@@ -4,6 +4,7 @@
 require_once('Exceptions.php');
 require_once('KeeoConnector.php');
 require_once('Entity/Entity.php');
+require_once('Entity/EventCategory.php');
 require_once('Entity/Address.php');
 require_once('Entity/Person.php');
 require_once('Entity/PersonAttribute.php');
@@ -12,7 +13,8 @@ require_once('Entity/Unit.php');
 
 require_once('config.php');
 
-class Keeo {
+class Keeo
+{
 	/**
 	 * Checks the given credentials against keeo. Returns true if the credentials are correct.
 	 * Throws an exception when the login failed.
@@ -280,16 +282,25 @@ class Keeo {
 	/**
 	 * Gets the event categories
 	 *
-	 * @return array
+	 * @return \Keeo\Entity\EventCategory[]
 	 */
 	public function getEventCategories() {
 		$connector = new KeeoConnector();
+        $categories = array();
 
 		$response = $connector->get('/event/categories.json');
-		$categories = json_decode($response->body, true);
+		$categoriesData = json_decode($response->body, true);
+
+        if(isset($categoriesData['event_categories'])) {
+            $categoriesData = $categoriesData['event_categories'];
+        } else {
+            throw new InvalidResponseException();
+        }
+
+        foreach($categoriesData as $categoryData) {
+            $categories[] = new \Keeo\Entity\EventCategory($categoryData);
+        }
 
 		return $categories;
 	}
-
-
 }

@@ -81,6 +81,9 @@ abstract class Entity {
 			case 'PersonAttributes':
 				$object = new PersonAttribute();
 				break;
+            case 'event_categories':
+                $object = new EventCategory();
+                break;
 			default:
 				throw new \InvalidResponseException('\'' . $key . '\' is not a known object name');
 		}
