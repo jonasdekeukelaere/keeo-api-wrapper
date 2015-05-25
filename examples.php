@@ -1,6 +1,6 @@
 <?php
 // Initialize Keeo
-require_once('keeo.php');
+require_once('Keeo.php');
 $keeo = new Keeo();
 
 // check credentials
