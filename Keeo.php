@@ -12,6 +12,7 @@ require_once('Entity/Address.php');
 require_once('Entity/Person.php');
 require_once('Entity/PersonAttribute.php');
 require_once('Entity/PersonFunction.php');
+require_once('Entity/PriceCategory.php');
 require_once('Entity/Unit.php');
 
 require_once('config.php');

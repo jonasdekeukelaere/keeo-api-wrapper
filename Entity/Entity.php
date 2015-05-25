@@ -81,7 +81,7 @@ abstract class Entity {
 			case 'PersonAttributes':
 				$object = new PersonAttribute();
 				break;
-            case 'event_categories':
+            case 'EventCategory':
                 $object = new EventCategory();
                 break;
             case 'SubscriptionStatus':
