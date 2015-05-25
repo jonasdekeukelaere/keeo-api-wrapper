@@ -303,4 +303,58 @@ class Keeo
 
 		return $categories;
 	}
+
+    /**
+     * Searches events based on given parameters
+     *
+     * @param int|null $categoryId   category id, found in getEventCategories()
+     * @param DateTime|null $startDateFrom   start date later or equal to this value
+     * @param DateTime|null $startDateUntil  start date earlier or equal to this value
+     * @param DateTime|null $endDateFrom     end date later or equal to this value
+     * @param DateTime|null $endDateUntil    end date earlier or equal to this value
+     *
+     * @return string[]     Event codes
+     */
+    public function findEvents(
+        $categoryId = null,
+        DateTime $startDateFrom = null,
+        DateTime $startDateUntil = null,
+        DateTime $endDateFrom = null,
+        DateTime $endDateUntil = null
+    )
+    {
+        $connector = new KeeoConnector();
+
+        // build search params
+        $searchParams = array();
+        if(!empty($categoryId)){
+            $searchParams['category_id'] = $categoryId;
+        }
+        if(!empty($startDateFrom)){
+            $searchParams['start[from]'] = $startDateFrom->format('Y-m-d');
+        }
+        if(!empty($startDateUntil)){
+            $searchParams['start[until]'] = $startDateUntil->format('Y-m-d');
+        }
+        if(!empty($endDateFrom)){
+            $searchParams['end[from]'] = $endDateFrom->format('Y-m-d');
+        }
+        if(!empty($endDateUntil)){
+            $searchParams['end[until]'] = $endDateUntil->format('Y-m-d');
+        }
+
+        $foundEvents = array();
+        if(!empty($searchParams)) {
+            $response = $connector->post('/event/search.json', $searchParams);
+
+            if($response->headers['Status-Code'] == '200') {
+                $foundEvents = json_decode($response->body);
+                $foundEvents = $foundEvents->event_codes;
+            }
+        } else {
+            throw new InvalidArgumentException('At least one search parameter needs to be given.');
+        }
+
+        return $foundEvents;
+    }
 }

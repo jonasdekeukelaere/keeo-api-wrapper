@@ -29,4 +29,13 @@ $members = $keeo->getAllMembersInUnit('500'); // unitnumber
 $numberOfPersons = $keeo->getNumberOfPersonsInUnit('500'); // unitnumber
 
 // get the event categories
-$categories = $this->getEventCategories();
+$categories = $keeo->getEventCategories();
+
+// get events
+$events = $keeo->findEvents(
+    1,   // category id
+    DateTime::createFromFormat('Y-m-d', '2013-01-01'),  // start date from
+    DateTime::createFromFormat('Y-m-d', '2013-12-31') , // start date until
+    DateTime::createFromFormat('Y-m-d', '2015-05-01'),  // end date from
+    DateTime::createFromFormat('Y-m-d', '2015-05-31')   // end date until
+);
