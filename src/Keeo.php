@@ -1,21 +1,17 @@
 <?php
 
-// bootstrap keeo
-require_once('Exceptions.php');
-require_once('KeeoConnector.php');
-require_once('Entity/Entity.php');
-require_once('Entity/Event.php');
-require_once('Entity/EventCategory.php');
-require_once('Entity/EventSubscriptionStatus.php');
-require_once('Entity/EventVisibility.php');
-require_once('Entity/Address.php');
-require_once('Entity/Person.php');
-require_once('Entity/PersonAttribute.php');
-require_once('Entity/PersonFunction.php');
-require_once('Entity/PriceCategory.php');
-require_once('Entity/Unit.php');
+namespace FOSOpenScouting\Keeo;
 
-require_once('config.php');
+use DateTime;
+use FOSOpenScouting\Keeo\Entity\Event;
+use FOSOpenScouting\Keeo\Entity\EventCategory;
+use FOSOpenScouting\Keeo\Entity\Person;
+use FOSOpenScouting\Keeo\Entity\PersonFunction;
+use FOSOpenScouting\Keeo\Entity\Unit;
+use FOSOpenScouting\Keeo\Exception\CredentialsDoNotMatchException;
+use FOSOpenScouting\Keeo\Exception\InvalidResponseException;
+use FOSOpenScouting\Keeo\KeeoConnector;
+use InvalidArgumentException;
 
 class Keeo
 {
@@ -55,6 +51,7 @@ class Keeo
 						$credentialsCorrect = true;
 					}
 				} else {
+                    $message = '';
 					if(isset($receivedData['message'])) {
 						$message = $receivedData['message'];
 					}
@@ -69,10 +66,10 @@ class Keeo
 	}
 
 	/**
-	 * Get a person from Keeo
+	 * Get a person from src
 	 *
 	 * @param $stemnumber
-	 * @return \Keeo\Entity\Person
+	 * @return Person
 	 * @throws InvalidResponseException
 	 */
 	public function getPerson($stemnumber) {
@@ -84,13 +81,13 @@ class Keeo
 		if(isset($personData['person'])) $personData = $personData['person'];
 		else throw new InvalidResponseException();
 
-		return new \Keeo\Entity\Person($personData);
+		return new Person($personData);
 	}
 
 	/**
-	 * Get a function from Keeo
+	 * Get a function from src
 	 *
-	 * @return \Keeo\Entity\PersonFunction
+	 * @return PersonFunction
 	 */
 	public function getFunctions() {
 		$functions = array();
@@ -103,7 +100,7 @@ class Keeo
 		else throw new InvalidResponseException();
 
 		foreach($functionsData as $functionData) {
-			$functions[] = new \Keeo\Entity\PersonFunction($functionData);
+			$functions[] = new PersonFunction($functionData);
 		}
 
 		return $functions;
@@ -158,10 +155,10 @@ class Keeo
 	}
 
 	/**
-	 * Get a unit from Keeo
+	 * Get a unit from src
 	 *
 	 * @param $unitNumber
-	 * @return \Keeo\Entity\Unit
+	 * @return Unit
 	 */
 	public function getUnit($unitNumber)
 	{
@@ -173,7 +170,7 @@ class Keeo
 		if(isset($unitData['unit_data'])) $unitData = $unitData['unit_data'];
 		else throw new InvalidResponseException();
 
-		return new \Keeo\Entity\Unit($unitData);
+		return new Unit($unitData);
 	}
 
 	public function getNumberOfPersonsInUnit($unitNumber, $functionNumber = null) {
@@ -200,7 +197,7 @@ class Keeo
 	 * Get all members in a unit
 	 *
 	 * @param $unitNumber
-	 * @return array<\Keeo\Entity\Person>
+	 * @return array<\src\Entity\Person>
 	 */
 	public function getAllMembersInUnit($unitNumber) {
 		return $this->searchMembersInUnit($unitNumber);
@@ -209,11 +206,12 @@ class Keeo
 	/**
 	 * @param $unitNumber
 	 * @param string $functionNumber
-	 * @return array<\Keeo\Entity\Person>
+	 * @return Person[]
 	 * @throws InvalidResponseException
 	 */
 	public function searchMembersInUnit($unitNumber, $functionNumber = null) {
 		$connector = new KeeoConnector();
+        $members = array();
 
 		$params = array(
 			'number' => $unitNumber
@@ -230,12 +228,15 @@ class Keeo
 		}
 
 		foreach($membersData as $memberData) {
-			$members[] = new \Keeo\Entity\Person($memberData);
+			$members[] = new Person($memberData);
 		}
 
 		return $members;
 	}
 
+    /**
+     * @return mixed
+     */
 	public function getUnitCategories() {
 		$connector = new KeeoConnector();
 
@@ -246,7 +247,7 @@ class Keeo
 	}
 
 	/**
-	 * Get all unitnumbers in Keeo
+	 * Get all unitnumbers in src
 	 *
 	 * @return array<string>
 	 */
@@ -286,7 +287,7 @@ class Keeo
 	/**
 	 * Gets the event categories
 	 *
-	 * @return \Keeo\Entity\EventCategory[]
+	 * @return EventCategory[]
 	 */
 	public function getEventCategories() {
 		$connector = new KeeoConnector();
@@ -302,7 +303,7 @@ class Keeo
         }
 
         foreach($categoriesData as $categoryData) {
-            $categories[] = new \Keeo\Entity\EventCategory($categoryData);
+            $categories[] = new EventCategory($categoryData);
         }
 
 		return $categories;
@@ -318,6 +319,7 @@ class Keeo
      * @param DateTime|null $endDateUntil    end date earlier or equal to this value
      *
      * @return string[]     Event codes
+     * @throws InvalidArgumentException
      */
     public function findEvents(
         $categoryId = null,
@@ -372,6 +374,6 @@ class Keeo
         if(isset($eventData['event'])) $eventData = $eventData['event'];
         else throw new InvalidResponseException();
 
-        return new \Keeo\Entity\Event($eventData);
+        return new Event($eventData);
     }
 }

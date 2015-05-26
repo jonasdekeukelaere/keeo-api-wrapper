@@ -113,6 +113,4 @@ class Address extends Entity{
 	{
 		return $this->street;
 	}
-
-
 }

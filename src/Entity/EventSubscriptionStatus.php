@@ -1,12 +1,13 @@
 <?php
 
-namespace Keeo\Entity;
+namespace FOSOpenScouting\Keeo\Entity;
 
 
-class EventCategory extends Entity
+class EventSubscriptionStatus extends Entity
 {
     protected $id;
     protected $name;
+    protected $deleted;
 
     /**
      * @return mixed
@@ -22,5 +23,13 @@ class EventCategory extends Entity
     public function getName()
     {
         return $this->name;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDeleted()
+    {
+        return $this->deleted;
     }
 }

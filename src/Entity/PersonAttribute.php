@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Keeo\Entity;
+namespace FOSOpenScouting\Keeo\Entity;
 
 
 class PersonAttribute extends Entity{

@@ -1,0 +1,46 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "This file is @generated automatically"
+    ],
+    "hash": "063f72ae7c6a0d005faa0da311fa31e6",
+    "packages": [
+        {
+            "name": "shuber/curl",
+            "version": "v1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/hamstar/curl.git",
+                "reference": "5962b52b8cde52dbae87ed3901a0de88c757cb0e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/hamstar/curl/zipball/5962b52b8cde52dbae87ed3901a0de88c757cb0e",
+                "reference": "5962b52b8cde52dbae87ed3901a0de88c757cb0e",
+                "shasum": ""
+            },
+            "type": "library",
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "PHP Wrapper for Curl",
+            "keywords": [
+                "bot",
+                "curl",
+                "scraper",
+                "spider"
+            ],
+            "time": "2012-06-02 20:57:42"
+        }
+    ],
+    "packages-dev": [],
+    "aliases": [],
+    "minimum-stability": "stable",
+    "stability-flags": [],
+    "prefer-stable": false,
+    "prefer-lowest": false,
+    "platform": [],
+    "platform-dev": []
+}

@@ -1,6 +1,6 @@
 <?php
 
-namespace Keeo\Entity;
+namespace FOSOpenScouting\Keeo\Entity;
 
 
 class EventVisibility extends Entity

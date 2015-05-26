@@ -1,0 +1,24 @@
+{
+    "name": "fosopenscouting/keeo-api-wrapper",
+    "description": "A wrapper around the Keeo API",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+      {
+        "name": "Thomas Crepain",
+        "email": "info@thomascrepain.be"
+      }
+    ],
+    "minimum-stability": "stable",
+    "autoload": {
+      "psr-4": {
+        "FOSOpenScouting\\Keeo\\": "src"
+      },
+      "classmap": [
+        "vendor/shuber/curl/lib"
+      ]
+    },
+    "require": {
+        "shuber/curl": "^1.0"
+    }
+}

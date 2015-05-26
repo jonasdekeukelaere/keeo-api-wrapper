@@ -1,5 +1,8 @@
 <?php
-require_once('curl/curl.php');
+
+namespace FOSOpenScouting\Keeo;
+
+use Curl;
 
 class KeeoConnector extends Curl
 {
@@ -21,6 +24,4 @@ class KeeoConnector extends Curl
 	{
 		return parent::post(KEEO_API_URL.$url, $vars);
 	}
-
-
 } 
