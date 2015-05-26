@@ -12,7 +12,7 @@ class KeeoConnector extends Curl
 
 		$this->options['CURLOPT_SSL_VERIFYPEER'] = false;
 		$this->options['CURLOPT_SSL_VERIFYHOST'] = false;
-		$this->options['CURLOPT_USERPWD'] = KEEO_API_USERNAME . ":" . KEEO_API_PASSWORD;
+		$this->setAuth(KEEO_API_USERNAME, KEEO_API_PASSWORD);
 	}
 
 	function get($url, $vars = array())
