@@ -3,6 +3,7 @@
 namespace FOSOpenScouting\Keeo;
 
 use Curl;
+use FOSOpenScouting\Keeo\Exception\NotAuthenticatedException;
 
 class KeeoConnector extends Curl
 {
@@ -15,13 +16,57 @@ class KeeoConnector extends Curl
 		$this->setAuth(KEEO_API_USERNAME, KEEO_API_PASSWORD);
 	}
 
+    /**
+     * @param string $url
+     * @param array $vars
+     * @return \CurlResponse
+     * @throws NotAuthenticatedException
+     */
 	function get($url, $vars = array())
 	{
-		return parent::get(KEEO_API_URL.$url, $vars);
+		$response = parent::get(KEEO_API_URL.$url, $vars);
+
+        $this->checkResponse($response);
+
+        return $response;
 	}
 
+    /**
+     * @param string $url
+     * @param array $vars
+     * @return bool|\CurlResponse
+     * @throws NotAuthenticatedException
+     */
 	function post($url, $vars = array())
 	{
-		return parent::post(KEEO_API_URL.$url, $vars);
+		$response = parent::post(KEEO_API_URL.$url, $vars);
+
+        $this->checkResponse($response);
+
+        return $response;
 	}
+
+    /**
+     * @param $response
+     * @throws NotAuthenticatedException
+     */
+    protected function checkResponse($response)
+    {
+        $this->isAuthenticated($response);
+    }
+
+    /**
+     * @param $response
+     * @throws NotAuthenticatedException
+     * @return bool
+     */
+    protected function isAuthenticated($response)
+    {
+        if ($response->headers['Status-Code'] == '401') {
+            // Throw exception
+            throw new NotAuthenticatedException(isset($response->headers['["WWW-Authenticate"]']) ? $response->headers['["WWW-Authenticate"]'] : '');
+        }
+
+        return true;
+    }
 } 
