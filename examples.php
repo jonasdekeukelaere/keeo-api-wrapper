@@ -1,12 +1,15 @@
 <?php
+
+require __DIR__ . '/vendor/autoload.php';
+
 // Initialize Keeo
-require_once('Keeo.php');
-$keeo = new Keeo();
+require_once('config.php');
+$keeo = new \FOSOpenScouting\Keeo\Keeo();
 
 // check credentials
 try {
 	$isLoggedIn = $keeo->userLogin('2014000217', 'test123'); // username, password (unencrypted)
-} catch (CredentialsDoNotMatchException $e) {
+} catch (\FOSOpenScouting\Keeo\Exception\CredentialsDoNotMatchException $e) {
 	// username and/or password are incorrect
 }
 
