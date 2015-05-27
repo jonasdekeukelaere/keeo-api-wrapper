@@ -1,5 +1,6 @@
 <?php
 
+// require the Composer autoloader
 require __DIR__ . '/vendor/autoload.php';
 
 // defines an array $config, see config.sample.php for its structure
@@ -40,7 +41,7 @@ $numberOfPersons = $keeo->getNumberOfPersonsInUnit('500'); // unitnumber
 // get the event categories
 $categories = $keeo->getEventCategories();
 
-// get events
+// find events, returns a list of event codes
 $events = $keeo->findEvents(
     1,   // category id
     DateTime::createFromFormat('Y-m-d', '2013-01-01'),  // start date from
@@ -49,4 +50,5 @@ $events = $keeo->findEvents(
     DateTime::createFromFormat('Y-m-d', '2015-05-31')   // end date until
 );
 
+// get event
 $event = $keeo->getEvent('SD2014');
