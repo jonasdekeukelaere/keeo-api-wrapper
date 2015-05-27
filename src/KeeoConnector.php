@@ -3,6 +3,8 @@
 namespace FOSOpenScouting\Keeo;
 
 use Curl;
+use FOSOpenScouting\Keeo\Exception\InternalKeeoServerErrorException;
+use FOSOpenScouting\Keeo\Exception\InvalidResponseException;
 use FOSOpenScouting\Keeo\Exception\NotAuthenticatedException;
 
 class KeeoConnector extends Curl
@@ -64,21 +66,17 @@ class KeeoConnector extends Curl
      */
     protected function checkResponse($response)
     {
-        $this->isAuthenticated($response);
-    }
-
-    /**
-     * @param $response
-     * @throws NotAuthenticatedException
-     * @return bool
-     */
-    protected function isAuthenticated($response)
-    {
-        if ($response->headers['Status-Code'] == '401') {
-            // Throw exception
-            throw new NotAuthenticatedException(isset($response->headers['["WWW-Authenticate"]']) ? $response->headers['["WWW-Authenticate"]'] : '');
+        if (isset($response->headers['Status-Code'])) {
+            switch ($response->headers['Status-Code']) {
+                case '401':
+                    // Throw exception
+                    throw new NotAuthenticatedException(isset($response->headers['WWW-Authenticate']) ? $response->headers['WWW-Authenticate'] : '');
+                    break;
+                case '500':
+                    throw new InternalKeeoServerErrorException(isset($response->headers['Status']) ? $response->headers['Status'] : '');
+            }
+        } else {
+            throw new InvalidResponseException('Status code not set');
         }
-
-        return true;
     }
 }
