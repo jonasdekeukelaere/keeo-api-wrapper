@@ -15,6 +15,15 @@ use InvalidArgumentException;
 
 class Keeo
 {
+    /**
+     * @var KeeoConnector
+     */
+    protected $keeoConnector;
+
+    public function __construct() {
+        $this->keeoConnector = new KeeoConnector();
+    }
+    
 	/**
 	 * Checks the given credentials against keeo. Returns true if the credentials are correct.
 	 * Throws an exception when the login failed.
@@ -27,9 +36,8 @@ class Keeo
 	 */
 	public function userLogin ($stemnumber, $password) {
 		$credentialsCorrect = false;
-		$connector = new KeeoConnector();
 
-		$response = $connector->post('/person/login.json', array(
+		$response = $this->keeoConnector->post('/person/login.json', array(
 			'login' => $stemnumber,
 			'password' => $password
 		));
@@ -72,11 +80,11 @@ class Keeo
 	 * @return Person
 	 * @throws InvalidResponseException
 	 */
-	public function getPerson($stemnumber) {
-		$connector = new KeeoConnector();
+	public function getPerson($stemnumber) 
+    {
         $result = null;
 
-		$response = $connector->get('/person/'.$stemnumber.'.json');
+		$response = $this->keeoConnector->get('/person/'.$stemnumber.'.json');
 
         switch ($response->headers['Status-Code']) {
             case '200':
@@ -102,11 +110,11 @@ class Keeo
 	 *
 	 * @return PersonFunction
 	 */
-	public function getFunctions() {
+	public function getFunctions() 
+    {
 		$functions = array();
-		$connector = new KeeoConnector();
-
-		$response = $connector->get('/person/functions.json');
+		
+		$response = $this->keeoConnector->get('/person/functions.json');
 		$functionsData = json_decode($response->body, true);
 
 		if(isset($functionsData['functions'])) $functionsData = $functionsData['functions'];
@@ -129,8 +137,8 @@ class Keeo
 	 * @return array
 	 * @throws InvalidArgumentException
 	 */
-	public function findUser($firstName = '', $name = '', $email = '', DateTime $birthDate = null) {
-		$connector = new KeeoConnector();
+	public function findUser($firstName = '', $name = '', $email = '', DateTime $birthDate = null)
+    {
 		$foundUsers = array();
 
 		// build search params
@@ -149,7 +157,7 @@ class Keeo
 		}
 
 		if(!empty($searchParams)) {
-			$response = $connector->post('/person/verify.json', $searchParams);
+			$response = $this->keeoConnector->post('/person/verify.json', $searchParams);
 
 			if($response->headers['Status-Code'] == '200') {
 				$foundUsers = json_decode($response->body);
@@ -169,9 +177,7 @@ class Keeo
 	 */
 	public function getUnit($unitNumber)
 	{
-		$connector = new KeeoConnector();
-
-		$response = $connector->get('/unit/'.$unitNumber.'.json');
+		$response = $this->keeoConnector->get('/unit/'.$unitNumber.'.json');
 		$unitData = json_decode($response->body, true);
 
 		if(isset($unitData['unit_data'])) $unitData = $unitData['unit_data'];
@@ -180,15 +186,14 @@ class Keeo
 		return new Unit($unitData);
 	}
 
-	public function getNumberOfPersonsInUnit($unitNumber, $functionNumber = null) {
-		$connector = new KeeoConnector();
-
+	public function getNumberOfPersonsInUnit($unitNumber, $functionNumber = null)
+    {
 		$params = array(
 			'number' => $unitNumber
 		);
 		if(!empty($functionNumber)) $params['function_number'] = $functionNumber;
 
-		$response = $connector->post('/unit/search-member-count.json', $params);
+		$response = $this->keeoConnector->post('/unit/search-member-count.json', $params);
 		$responseBody = json_decode($response->body, true);
 
 		if(isset($responseBody['count'])) {
@@ -206,7 +211,8 @@ class Keeo
 	 * @param $unitNumber
 	 * @return array<\src\Entity\Person>
 	 */
-	public function getAllMembersInUnit($unitNumber) {
+	public function getAllMembersInUnit($unitNumber)
+    {
 		return $this->searchMembersInUnit($unitNumber);
 	}
 
@@ -216,8 +222,8 @@ class Keeo
 	 * @return Person[]
 	 * @throws InvalidResponseException
 	 */
-	public function searchMembersInUnit($unitNumber, $functionNumber = null) {
-		$connector = new KeeoConnector();
+	public function searchMembersInUnit($unitNumber, $functionNumber = null)
+    {
         $members = array();
 
 		$params = array(
@@ -225,7 +231,7 @@ class Keeo
 		);
 		if(!empty($functionNumber)) $params['function_number'] = $functionNumber;
 
-		$response = $connector->get('/unit/search-members.json', $params);
+		$response = $this->keeoConnector->get('/unit/search-members.json', $params);
 		$membersData = json_decode($response->body, true);
 
 		if(isset($membersData['unit_members'])) {
@@ -244,10 +250,9 @@ class Keeo
     /**
      * @return mixed
      */
-	public function getUnitCategories() {
-		$connector = new KeeoConnector();
-
-		$response = $connector->get('/unit/categories.json');
+	public function getUnitCategories()
+    {
+		$response = $this->keeoConnector->get('/unit/categories.json');
 		$categories = json_decode($response->body, true);
 
 		return $categories;
@@ -258,7 +263,8 @@ class Keeo
 	 *
 	 * @return array<string>
 	 */
-	public function getAllUnitNumbers() {
+	public function getAllUnitNumbers()
+    {
 		return $this->getUnitsNumbersInCategory(1);
 	}
 
@@ -271,12 +277,10 @@ class Keeo
 	 */
 	public function getUnitsNumbersInCategory($categoryId)
 	{
-		$connector = new KeeoConnector();
-
 		$params = array();
 		if(!empty($categoryId)) $params['category_id'] = $categoryId;
 
-		$response = $connector->get('/unit/select-by-category-id.json', array(
+		$response = $this->keeoConnector->get('/unit/select-by-category-id.json', array(
 			'category_id' => $categoryId
 		));
 		$unitData = json_decode($response->body, true);
@@ -296,11 +300,11 @@ class Keeo
 	 *
 	 * @return EventCategory[]
 	 */
-	public function getEventCategories() {
-		$connector = new KeeoConnector();
+	public function getEventCategories()
+    {
         $categories = array();
 
-		$response = $connector->get('/event/categories.json');
+		$response = $this->keeoConnector->get('/event/categories.json');
 		$categoriesData = json_decode($response->body, true);
 
         if(isset($categoriesData['event_categories'])) {
@@ -334,10 +338,7 @@ class Keeo
         DateTime $startDateUntil = null,
         DateTime $endDateFrom = null,
         DateTime $endDateUntil = null
-    )
-    {
-        $connector = new KeeoConnector();
-
+    ) {
         // build search params
         $searchParams = array();
         if(!empty($categoryId)){
@@ -358,7 +359,7 @@ class Keeo
 
         $foundEvents = array();
         if(!empty($searchParams)) {
-            $response = $connector->post('/event/search.json', $searchParams);
+            $response = $this->keeoConnector->post('/event/search.json', $searchParams);
 
             if($response->headers['Status-Code'] == '200') {
                 $foundEvents = json_decode($response->body);
@@ -373,9 +374,7 @@ class Keeo
 
     public function getEvent($eventCode)
     {
-        $connector = new KeeoConnector();
-
-        $response = $connector->get('/event/' . $eventCode . '.json');
+        $response = $this->keeoConnector->get('/event/' . $eventCode . '.json');
         $eventData = json_decode($response->body, true);
 
         if(isset($eventData['event'])) $eventData = $eventData['event'];
