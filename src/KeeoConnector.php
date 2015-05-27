@@ -74,6 +74,9 @@ class KeeoConnector extends Curl
                     break;
                 case '500':
                     throw new InternalKeeoServerErrorException(isset($response->headers['Status']) ? $response->headers['Status'] : '');
+                    break;
+                default:
+                    break;
             }
         } else {
             throw new InvalidResponseException('Status code not set');
