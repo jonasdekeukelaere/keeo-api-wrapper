@@ -74,7 +74,7 @@ class Keeo
 	}
 
 	/**
-	 * Get a person from src
+	 * Get a person from Keeo
 	 *
 	 * @param $stemnumber
 	 * @return Person
@@ -106,7 +106,7 @@ class Keeo
 	}
 
 	/**
-	 * Get a function from src
+	 * Get a function from Keeo
 	 *
 	 * @return PersonFunction
 	 */
@@ -170,7 +170,7 @@ class Keeo
 	}
 
 	/**
-	 * Get a unit from src
+	 * Get a unit from Keeo
 	 *
 	 * @param $unitNumber
 	 * @return Unit
@@ -186,12 +186,37 @@ class Keeo
 		return new Unit($unitData);
 	}
 
-	public function getNumberOfPersonsInUnit($unitNumber, $functionNumber = null)
+    /**
+     * Get the number of persons in a given unit
+     *
+     * @param Unit|string|int $unit Unit object or unit number
+     * @param PersonFunction|string|int|null $function
+     * @return int
+     * @throws InvalidArgumentException
+     */
+	public function getNumberOfPersonsInUnit($unit, $function = null)
     {
-		$params = array(
-			'number' => $unitNumber
-		);
-		if(!empty($functionNumber)) $params['function_number'] = $functionNumber;
+        if (is_numeric($unit)) {
+            $unitNumber = $unit;
+        } elseif ($unit instanceof Unit) {
+            $unitNumber = $unit->getNumber();
+        } else {
+            throw new InvalidArgumentException('Unit must be an instance of Unit or be an numerical value');
+        }
+
+        $params = array(
+            'number' => $unitNumber
+        );
+
+		if(!empty($function)) {
+            if (is_numeric($function)) {
+                $params['function_number'] = $function;
+            } elseif ($function instanceof PersonFunction) {
+                $params['function_number'] = $function->getNumber();
+            } else {
+                throw new InvalidArgumentException('Function must be an instance of PersonFunction or be an numerical value');
+            }
+        }
 
 		$response = $this->keeoConnector->post('/unit/search-member-count.json', $params);
 		$responseBody = json_decode($response->body, true);
@@ -209,7 +234,7 @@ class Keeo
 	 * Get all members in a unit
 	 *
 	 * @param $unitNumber
-	 * @return array<\src\Entity\Person>
+	 * @return Person[]
 	 */
 	public function getAllMembersInUnit($unitNumber)
     {
@@ -248,20 +273,34 @@ class Keeo
 	}
 
     /**
-     * @return mixed
+     * Get all unit categories
+     *
+     * @return array (
+     *      'id' => id,
+     *      'name" => name,
+     *      'children' => array(
+     *          ...
+     *      )
+     * )
      */
 	public function getUnitCategories()
     {
 		$response = $this->keeoConnector->get('/unit/categories.json');
 		$categories = json_decode($response->body, true);
 
+        if(isset($categories['structure'])) {
+            $categories = $categories['structure'];
+        } else {
+            throw new InvalidResponseException();
+        }
+
 		return $categories;
 	}
 
 	/**
-	 * Get all unitnumbers in src
+	 * Get all unitnumbers in Keeo
 	 *
-	 * @return array<string>
+	 * @return string[]
 	 */
 	public function getAllUnitNumbers()
     {
@@ -272,7 +311,7 @@ class Keeo
 	 * Get all unit numbers within a category
 	 *
 	 * @param $categoryId
-	 * @return mixed
+	 * @return string[]
 	 * @throws InvalidResponseException
 	 */
 	public function getUnitsNumbersInCategory($categoryId)
@@ -299,6 +338,7 @@ class Keeo
 	 * Gets the event categories
 	 *
 	 * @return EventCategory[]
+     * @throws InvalidResponseException
 	 */
 	public function getEventCategories()
     {
@@ -372,6 +412,13 @@ class Keeo
         return $foundEvents;
     }
 
+    /**
+     * Get the event with the given event code
+     *
+     * @param $eventCode
+     * @return Event
+     * @throws InvalidResponseException
+     */
     public function getEvent($eventCode)
     {
         $response = $this->keeoConnector->get('/event/' . $eventCode . '.json');
