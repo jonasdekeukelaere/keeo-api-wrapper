@@ -7,14 +7,26 @@ use FOSOpenScouting\Keeo\Exception\NotAuthenticatedException;
 
 class KeeoConnector extends Curl
 {
-	public function __construct()
+    /**
+     * @var Config
+     */
+    protected $config;
+
+    public function __construct(Config $config)
 	{
+        $this->setConfig($config);
+
 		parent::__construct();
 
 		$this->options['CURLOPT_SSL_VERIFYPEER'] = false;
 		$this->options['CURLOPT_SSL_VERIFYHOST'] = false;
-		$this->setAuth(KEEO_API_USERNAME, KEEO_API_PASSWORD);
+		$this->setAuth($this->config->getApiUsername(), $this->config->getApiPassword());
 	}
+
+    protected function setConfig(Config $config)
+    {
+        $this->config = $config;
+    }
 
     /**
      * @param string $url
@@ -24,7 +36,7 @@ class KeeoConnector extends Curl
      */
 	function get($url, $vars = array())
 	{
-		$response = parent::get(KEEO_API_URL.$url, $vars);
+		$response = parent::get($this->config->getApiUrl() . $url, $vars);
 
         $this->checkResponse($response);
 
@@ -39,7 +51,7 @@ class KeeoConnector extends Curl
      */
 	function post($url, $vars = array())
 	{
-		$response = parent::post(KEEO_API_URL.$url, $vars);
+		$response = parent::post($this->config->getApiUrl() . $url, $vars);
 
         $this->checkResponse($response);
 
@@ -69,4 +81,4 @@ class KeeoConnector extends Curl
 
         return true;
     }
-} 
+}

@@ -19,9 +19,17 @@ class Keeo
      * @var KeeoConnector
      */
     protected $keeoConnector;
+    /**
+     * @var Config
+     */
+    protected $config;
 
-    public function __construct() {
-        $this->keeoConnector = new KeeoConnector();
+    /**
+     * @param Config|array $config
+     */
+    public function __construct($config) {
+        $this->config = $config instanceof Config ? $config : new Config($config);
+        $this->keeoConnector = new KeeoConnector($this->config);
     }
     
 	/**
@@ -53,7 +61,7 @@ class Keeo
 					if(!isset($receivedData['hash'])) throw new InvalidResponseException();
 					// check the hash
 					$receivedHash = $receivedData['hash'];
-					$calculatedHash = md5($stemnumber.KEEO_USERLOGIN_SALT.$password.date('YmdH'));
+					$calculatedHash = md5($stemnumber.$this->config->getUserLoginSalt().$password.date('YmdH'));
 
 					if($receivedHash == $calculatedHash) {
 						$credentialsCorrect = true;

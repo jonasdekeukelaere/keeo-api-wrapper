@@ -2,9 +2,10 @@
 
 require __DIR__ . '/vendor/autoload.php';
 
-// Initialize Keeo
+// defines an array $config, see config.sample.php for its structure
 require_once('config.php');
-$keeo = new \FOSOpenScouting\Keeo\Keeo();
+// Initialize Keeo
+$keeo = new \FOSOpenScouting\Keeo\Keeo($config);
 
 // check credentials
 try {
