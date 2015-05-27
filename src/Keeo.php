@@ -79,7 +79,9 @@ class Keeo
 		$personData = json_decode($response->body, true);
 
 		if(isset($personData['person'])) $personData = $personData['person'];
-		else throw new InvalidResponseException();
+		else {
+            throw new InvalidResponseException();
+        }
 
 		return new Person($personData);
 	}
@@ -112,11 +114,11 @@ class Keeo
 	 * @param string $firstName
 	 * @param string $name
 	 * @param string $email
-	 * @param string $birthDate		Format: Y-m-d, ex: 2011-06-28
+	 * @param DateTime $birthDate
 	 * @return array
 	 * @throws InvalidArgumentException
 	 */
-	public function findUser($firstName = '', $name = '', $email = '', $birthDate='') {
+	public function findUser($firstName = '', $name = '', $email = '', DateTime $birthDate = null) {
 		$connector = new KeeoConnector();
 		$foundUsers = array();
 
@@ -132,13 +134,7 @@ class Keeo
 			$searchParams['email'] = $email;
 		}
 		if(!empty($birthDate)){
-			$birthDateObj = DateTime::createFromFormat('Y-m-d', $birthDate);
-
-			if($birthDateObj->format('Y-m-d') == $birthDate) {
-				$searchParams['birth_date'] = $birthDate;
-			} else {
-				throw new InvalidArgumentException('Please provide the birthDate in the Y-m-d format');
-			}
+			$searchParams['birth_date'] = $birthDate->format('Y-m-d');
 		}
 
 		if(!empty($searchParams)) {

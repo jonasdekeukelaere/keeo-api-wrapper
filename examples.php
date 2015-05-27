@@ -14,7 +14,12 @@ try {
 }
 
 // check if a person exists
-$results = $keeo->findUser('John', 'Doe', 'john.doe@fos.be', '1992-04-23');
+$results = $keeo->findUser(
+    'John',
+    'Doe',
+    'john.doe@fos.be',
+    DateTime::createFromFormat('Y-m-d', '1992-04-23')
+);
 
 // get a person
 $person = $keeo->getPerson('2013000708'); // stemnumber
