@@ -2,7 +2,6 @@
 
 namespace FOSOpenScouting\Keeo\Entity;
 
-
 class EventVisibility extends Entity
 {
     protected $id;

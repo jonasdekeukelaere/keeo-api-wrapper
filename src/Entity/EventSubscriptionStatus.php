@@ -2,7 +2,6 @@
 
 namespace FOSOpenScouting\Keeo\Entity;
 
-
 class EventSubscriptionStatus extends Entity
 {
     protected $id;

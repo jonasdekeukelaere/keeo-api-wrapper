@@ -1,10 +1,9 @@
 <?php
 
+namespace FOSOpenScouting\Keeo\Entity;
 
-namespace Keeo\Entity;
-
-
-class Address extends Entity{
+class Address extends Entity
+{
 	protected $id;
 	protected $street;
 	protected $number;

@@ -1,10 +1,9 @@
 <?php
 
-
 namespace FOSOpenScouting\Keeo\Entity;
 
-
-class PersonAttribute extends Entity{
+class PersonAttribute extends Entity
+{
 	protected $id;
 	protected $person_id;
 	protected $person_attribute_id;

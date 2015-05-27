@@ -2,7 +2,6 @@
 
 namespace FOSOpenScouting\Keeo\Entity;
 
-
 class EventCategory extends Entity
 {
     protected $id;

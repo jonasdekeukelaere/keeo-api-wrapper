@@ -1,10 +1,9 @@
 <?php
 
-
 namespace FOSOpenScouting\Keeo\Entity;
 
-
-abstract class Entity {
+abstract class Entity
+{
 	public function __construct($data = array()) {
 		if(!empty($data)) $this->setData($data);
 	}

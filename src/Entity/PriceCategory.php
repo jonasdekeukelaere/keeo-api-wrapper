@@ -2,7 +2,6 @@
 
 namespace FOSOpenScouting\Keeo\Entity;
 
-
 class PriceCategory extends Entity
 {
     protected $id;
