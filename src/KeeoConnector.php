@@ -22,12 +22,14 @@ class KeeoConnector extends Curl
 
 		$this->options['CURLOPT_SSL_VERIFYPEER'] = false;
 		$this->options['CURLOPT_SSL_VERIFYHOST'] = false;
-		$this->setAuth($this->config->getApiUsername(), $this->config->getApiPassword());
 	}
 
     protected function setConfig(Config $config)
     {
         $this->config = $config;
+
+        // (re)set auth now the config is set
+        $this->setAuth($this->config->getApiUsername(), $this->config->getApiPassword());
     }
 
     /**
