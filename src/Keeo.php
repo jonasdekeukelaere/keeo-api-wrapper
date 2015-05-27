@@ -74,16 +74,27 @@ class Keeo
 	 */
 	public function getPerson($stemnumber) {
 		$connector = new KeeoConnector();
+        $result = null;
 
 		$response = $connector->get('/person/'.$stemnumber.'.json');
-		$personData = json_decode($response->body, true);
 
-		if(isset($personData['person'])) $personData = $personData['person'];
-		else {
-            throw new InvalidResponseException();
+        switch ($response->headers['Status-Code']) {
+            case '200':
+                $personData = json_decode($response->body);
+                if(isset($personData['person'])) {
+                    $personData = $personData['person'];
+                } else {
+                    throw new InvalidResponseException();
+                }
+                $result = new Person($personData);
+                break;
+            case '404': // person not found
+            case '410': // person deleted
+            default:
+                $result = null;
         }
 
-		return new Person($personData);
+		return $result;
 	}
 
 	/**
