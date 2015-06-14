@@ -411,7 +411,7 @@ class Keeo
 
             if($response->headers['Status-Code'] == '200') {
                 $foundEvents = json_decode($response->body, true);
-                $foundEvents = $foundEvents->event_codes;
+                $foundEvents = $foundEvents['event_codes'];
             }
         } else {
             throw new InvalidArgumentException('At least one search parameter needs to be given.');
