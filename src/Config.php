@@ -6,7 +6,7 @@ use FOSOpenScouting\Keeo\Exception\ConfigIntegrityException;
 
 class Config
 {
-    protected $apiUrl = 'https://api.fos.be';
+    protected $apiUrl = 'https://keeo.fos.be/api';
     protected $apiUsername;
     protected $apiPassword;
     protected $userLoginSalt;
