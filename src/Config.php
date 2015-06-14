@@ -10,13 +10,14 @@ class Config
     protected $apiUsername;
     protected $apiPassword;
     protected $userLoginSalt;
+    protected $curlUserAgent = '';
 
     public function __construct(array $configArray) {
         $this->parseArray($configArray);
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getApiUrl()
     {
@@ -24,7 +25,7 @@ class Config
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getApiUsername()
     {
@@ -32,7 +33,7 @@ class Config
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getApiPassword()
     {
@@ -40,13 +41,24 @@ class Config
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getUserLoginSalt()
     {
         return $this->userLoginSalt;
     }
 
+    /**
+     * @return string
+     */
+    public function getCurlUserAgent()
+    {
+        return $this->curlUserAgent;
+    }
+
+    /**
+     * @param array $configArray
+     */
     protected function parseArray(array $configArray)
     {
         foreach ($configArray as $key => $value) {
@@ -86,6 +98,14 @@ class Config
     protected function setUserLoginSalt($userLoginSalt)
     {
         $this->userLoginSalt = $userLoginSalt;
+    }
+
+    /**
+     * @param string $curlUserAgent
+     */
+    protected function setCurlUserAgent($curlUserAgent)
+    {
+        $this->curlUserAgent = $curlUserAgent;
     }
 
     protected function testIntegrity()

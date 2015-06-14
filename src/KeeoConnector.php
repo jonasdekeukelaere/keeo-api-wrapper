@@ -23,6 +23,9 @@ class KeeoConnector extends Curl
         // verify secure connection
         $this->options['CURLOPT_SSL_VERIFYPEER'] = true;
         $this->options['CURLOPT_SSL_VERIFYHOST'] = 2;
+
+        // set custom user agent
+        $this->user_agent = 'fosopenscouting/keeo-api-wrapper ' . $this->config->getCurlUserAgent();
     }
 
     protected function setConfig(Config $config)

@@ -3,5 +3,6 @@ $config = array(
     'apiUrl' => 'https://keeo.fos.be/api',
     'apiUsername' => '',
     'apiPassword' => '',
-    'userLoginSalt' => ''
+    'userLoginSalt' => '',
+    'curlUserAgent' => 'example.com'
 );
