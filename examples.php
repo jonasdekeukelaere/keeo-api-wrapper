@@ -52,3 +52,12 @@ $events = $keeo->findEvents(
 
 // get event
 $event = $keeo->getEvent('SD2014');
+
+// subscribe person to an event
+$keeo->subscribePersonToEvent(
+    '2014000217',  // stemnumber from person to be subscribed to the event
+    'SD2014',       // event code
+    '2014000217',   // administrator stemnumber (administrator, unit with writing permissions or person to be subscribed)
+    'test123',      // password from administrator
+    6               // id of the price category
+);

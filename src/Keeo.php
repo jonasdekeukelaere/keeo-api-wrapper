@@ -7,8 +7,11 @@ use FOSOpenScouting\Keeo\Entity\Event;
 use FOSOpenScouting\Keeo\Entity\EventCategory;
 use FOSOpenScouting\Keeo\Entity\Person;
 use FOSOpenScouting\Keeo\Entity\PersonFunction;
+use FOSOpenScouting\Keeo\Entity\PriceCategory;
 use FOSOpenScouting\Keeo\Entity\Unit;
+use FOSOpenScouting\Keeo\Exception\ConflictAtEventSubscriptionException;
 use FOSOpenScouting\Keeo\Exception\CredentialsDoNotMatchException;
+use FOSOpenScouting\Keeo\Exception\ForbiddenEventSubscriptionException;
 use FOSOpenScouting\Keeo\Exception\InvalidResponseException;
 use FOSOpenScouting\Keeo\KeeoConnector;
 use InvalidArgumentException;
@@ -436,5 +439,55 @@ class Keeo
         else throw new InvalidResponseException();
 
         return new Event($eventData);
+    }
+
+    public function subscribePersonToEvent(
+        $person,
+        $event,
+        $administrator,
+        $administratorPassword,
+        $priceCategory = null
+    ) {
+        $subscribeParams =array();
+
+        if ($person instanceof Person) {
+            $person = $person->getStemnumber();
+        }
+        $subscribeParams['person_code'] = $person;
+
+        if ($event instanceof Event) {
+            $event = $event->getCode();
+        }
+        $subscribeParams['event_code'] = $event;
+
+        if ($administrator instanceof Person) {
+            $administrator = $administrator->getStemnumber();
+        }
+        $subscribeParams['administrator_code'] = $administrator;
+        $subscribeParams['administrator_password'] = $administratorPassword;
+        if (!is_null($priceCategory)) {
+            if ($priceCategory instanceof PriceCategory) {
+                $priceCategory = $priceCategory->getId();
+            }
+            $subscribeParams['price_category_id'] = $priceCategory;
+        }
+
+        $response = $this->keeoConnector->post('/event/subscribe.json', $subscribeParams);
+
+        switch ($response->headers['Status-Code']) {
+            case '204': // No content
+                // Person successfully subscribed to event
+                break;
+            case '403': // Forbidden
+                // admin password is not correct
+                throw new ForbiddenEventSubscriptionException(KeeoConnector::extractErrorMessageFromResponseHeaders($response->headers));
+                break;
+            case '409': // Conflict
+                // Wrong input
+                throw new ConflictAtEventSubscriptionException(KeeoConnector::extractErrorMessageFromResponseHeaders($response->headers));
+                break;
+            default:
+                break;
+        }
     }
 }

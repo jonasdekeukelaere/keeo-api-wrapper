@@ -4,7 +4,7 @@ namespace FOSOpenScouting\Keeo\Exception;
 
 use RuntimeException;
 
-class KeeoConnectionException  extends RuntimeException
+class KeeoConnectionException extends RuntimeException
 {
 
 }

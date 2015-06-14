@@ -3,6 +3,7 @@
 namespace FOSOpenScouting\Keeo;
 
 use Curl;
+use FOSOpenScouting\Keeo\Exception\BadRequestException;
 use FOSOpenScouting\Keeo\Exception\InternalKeeoServerErrorException;
 use FOSOpenScouting\Keeo\Exception\InvalidResponseException;
 use FOSOpenScouting\Keeo\Exception\NotAuthenticatedException;
@@ -74,12 +75,15 @@ class KeeoConnector extends Curl
     {
         if (isset($response->headers['Status-Code'])) {
             switch ($response->headers['Status-Code']) {
+                case '400': // Bad Request
+                    throw new BadRequestException(self::extractErrorMessageFromResponseHeaders($response->headers));
+                    break;
                 case '401':
                     // Throw exception
-                    throw new NotAuthenticatedException(isset($response->headers['WWW-Authenticate']) ? $response->headers['WWW-Authenticate'] : '');
+                    throw new NotAuthenticatedException(self::extractErrorMessageFromResponseHeaders($response->headers));
                     break;
                 case '500':
-                    throw new InternalKeeoServerErrorException(isset($response->headers['Status']) ? $response->headers['Status'] : '');
+                    throw new InternalKeeoServerErrorException(self::extractErrorMessageFromResponseHeaders($response->headers));
                     break;
                 default:
                     break;
@@ -87,5 +91,38 @@ class KeeoConnector extends Curl
         } else {
             throw new InvalidResponseException('Status code not set');
         }
+    }
+
+    /**
+     * @param array $headers
+     * @return string
+     */
+    public static function extractErrorMessageFromResponseHeaders(array $headers)
+    {
+        $errorMessage = '';
+
+        // Use json message if set
+        if (empty($errorMessage) && isset($headers['X-Json'])) {
+            // remove the brackets at the start and end of the json string
+            $jsonResponse = substr($headers['X-Json'], 1, -1);
+            // decode json
+            $jsonResponse = json_decode($jsonResponse, true);
+
+            if (isset($jsonResponse['message'])) {
+                $errorMessage = $jsonResponse['message'];
+            }
+        }
+
+        // Maybe the www authenticate error?
+        if (empty($errorMessage) && isset($headers['WWW-Authenticate'])) {
+            $errorMessage = $headers['WWW-Authenticate'];
+        }
+
+        // last change, just use the default status message
+        if (empty($errorMessage) && isset($headers['Status'])) {
+            $errorMessage = $headers['Status'];
+        }
+
+        return $errorMessage;
     }
 }
