@@ -96,7 +96,7 @@ class Keeo
 
         switch ($response->headers['Status-Code']) {
             case '200':
-                $personData = json_decode($response->body);
+                $personData = json_decode($response->body, true);
                 if(isset($personData['person'])) {
                     $personData = $personData['person'];
                 } else {
@@ -168,7 +168,7 @@ class Keeo
 			$response = $this->keeoConnector->post('/person/verify.json', $searchParams);
 
 			if($response->headers['Status-Code'] == '200') {
-				$foundUsers = json_decode($response->body);
+				$foundUsers = json_decode($response->body, true);
 			}
 		} else {
 			throw new InvalidArgumentException('At least one search parameter needs to be given.');
@@ -410,7 +410,7 @@ class Keeo
             $response = $this->keeoConnector->post('/event/search.json', $searchParams);
 
             if($response->headers['Status-Code'] == '200') {
-                $foundEvents = json_decode($response->body);
+                $foundEvents = json_decode($response->body, true);
                 $foundEvents = $foundEvents->event_codes;
             }
         } else {
