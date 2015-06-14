@@ -108,6 +108,11 @@ class Config
         $this->curlUserAgent = $curlUserAgent;
     }
 
+    /**
+     * Test if every config variable has a value, throws an error if not
+     *
+     * @throws ConfigIntegrityException
+     */
     protected function testIntegrity()
     {
         // get var names
@@ -115,7 +120,7 @@ class Config
 
         // check every variable if it is filled in
         foreach ($vars as $var) {
-            if (empty($this->{$var})) {
+            if (is_null($this->{$var})) {
                 throw new ConfigIntegrityException('There is no config value set for \'' . $var . '\'');
             }
         }
