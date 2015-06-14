@@ -9,10 +9,12 @@ use FOSOpenScouting\Keeo\Entity\Person;
 use FOSOpenScouting\Keeo\Entity\PersonFunction;
 use FOSOpenScouting\Keeo\Entity\PriceCategory;
 use FOSOpenScouting\Keeo\Entity\Unit;
+use FOSOpenScouting\Keeo\Exception\BadRequestException;
 use FOSOpenScouting\Keeo\Exception\ConflictAtEventSubscriptionException;
 use FOSOpenScouting\Keeo\Exception\CredentialsDoNotMatchException;
 use FOSOpenScouting\Keeo\Exception\ForbiddenEventSubscriptionException;
 use FOSOpenScouting\Keeo\Exception\InvalidResponseException;
+use FOSOpenScouting\Keeo\Exception\PersonAlreadySubscribedToEventException;
 use FOSOpenScouting\Keeo\KeeoConnector;
 use InvalidArgumentException;
 
@@ -472,7 +474,15 @@ class Keeo
             $subscribeParams['price_category_id'] = $priceCategory;
         }
 
-        $response = $this->keeoConnector->post('/event/subscribe.json', $subscribeParams);
+        try {
+            $response = $this->keeoConnector->post('/event/subscribe.json', $subscribeParams);
+        } catch (BadRequestException $e) {
+            if ($e->getMessage() == 'This person is already subscribed to this event.') {
+                throw new PersonAlreadySubscribedToEventException($e->getMessage());
+            } else {
+                throw $e;
+            }
+        }
 
         switch ($response->headers['Status-Code']) {
             case '204': // No content
