@@ -1,6 +1,6 @@
 <?php
 $config = array(
-    'apiUrl' => 'https://api.fos.be',
+    'apiUrl' => 'https://keeo.fos.be/api',
     'apiUsername' => '',
     'apiPassword' => '',
     'userLoginSalt' => ''

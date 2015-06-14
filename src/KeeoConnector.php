@@ -20,8 +20,9 @@ class KeeoConnector extends Curl
 
 		parent::__construct();
 
-		$this->options['CURLOPT_SSL_VERIFYPEER'] = false;
-		$this->options['CURLOPT_SSL_VERIFYHOST'] = false;
+		// verify secure connection
+		$this->options['CURLOPT_SSL_VERIFYPEER'] = 2;
+		$this->options['CURLOPT_SSL_VERIFYHOST'] = 2;
 	}
 
     protected function setConfig(Config $config)
