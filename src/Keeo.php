@@ -32,67 +32,67 @@ class Keeo
         $this->keeoConnector = new KeeoConnector($this->config);
     }
     
-	/**
-	 * Checks the given credentials against keeo. Returns true if the credentials are correct.
-	 * Throws an exception when the login failed.
-	 *
-	 * @param $stemnumber
-	 * @param $password
-	 * @return bool
-	 * @throws InvalidResponseException
-	 * @throws CredentialsDoNotMatchException
-	 */
-	public function userLogin ($stemnumber, $password) {
-		$credentialsCorrect = false;
+    /**
+     * Checks the given credentials against keeo. Returns true if the credentials are correct.
+     * Throws an exception when the login failed.
+     *
+     * @param $stemnumber
+     * @param $password
+     * @return bool
+     * @throws InvalidResponseException
+     * @throws CredentialsDoNotMatchException
+     */
+    public function userLogin ($stemnumber, $password) {
+        $credentialsCorrect = false;
 
-		$response = $this->keeoConnector->post('/person/login.json', array(
-			'login' => $stemnumber,
-			'password' => $password
-		));
+        $response = $this->keeoConnector->post('/person/login.json', array(
+            'login' => $stemnumber,
+            'password' => $password
+        ));
 
-		// validate response
-		if(!empty($response->headers['X-Json'])){
-			// remove the ( and ) at the beginning en ending of this string
-			$json = substr($response->headers['X-Json'], 1, -1);
-			$receivedData = json_decode($json, true);
+        // validate response
+        if(!empty($response->headers['X-Json'])){
+            // remove the ( and ) at the beginning en ending of this string
+            $json = substr($response->headers['X-Json'], 1, -1);
+            $receivedData = json_decode($json, true);
 
-			if(isset($receivedData['result']) && $receivedData['result'] = 'ok' && isset($receivedData['authenticated'])) {
-				if($receivedData['authenticated']) {
-					if(!isset($receivedData['hash'])) throw new InvalidResponseException();
-					// check the hash
-					$receivedHash = $receivedData['hash'];
-					$calculatedHash = md5($stemnumber.$this->config->getUserLoginSalt().$password.date('YmdH'));
+            if(isset($receivedData['result']) && $receivedData['result'] = 'ok' && isset($receivedData['authenticated'])) {
+                if($receivedData['authenticated']) {
+                    if(!isset($receivedData['hash'])) throw new InvalidResponseException();
+                    // check the hash
+                    $receivedHash = $receivedData['hash'];
+                    $calculatedHash = md5($stemnumber.$this->config->getUserLoginSalt().$password.date('YmdH'));
 
-					if($receivedHash == $calculatedHash) {
-						$credentialsCorrect = true;
-					}
-				} else {
+                    if($receivedHash == $calculatedHash) {
+                        $credentialsCorrect = true;
+                    }
+                } else {
                     $message = '';
-					if(isset($receivedData['message'])) {
-						$message = $receivedData['message'];
-					}
-					throw new CredentialsDoNotMatchException($message);
-				}
-			} else {
-				throw new InvalidResponseException();
-			}
-		}
+                    if(isset($receivedData['message'])) {
+                        $message = $receivedData['message'];
+                    }
+                    throw new CredentialsDoNotMatchException($message);
+                }
+            } else {
+                throw new InvalidResponseException();
+            }
+        }
 
-		return $credentialsCorrect;
-	}
+        return $credentialsCorrect;
+    }
 
-	/**
-	 * Get a person from Keeo
-	 *
-	 * @param $stemnumber
-	 * @return Person
-	 * @throws InvalidResponseException
-	 */
-	public function getPerson($stemnumber) 
+    /**
+     * Get a person from Keeo
+     *
+     * @param $stemnumber
+     * @return Person
+     * @throws InvalidResponseException
+     */
+    public function getPerson($stemnumber)
     {
         $result = null;
 
-		$response = $this->keeoConnector->get('/person/'.$stemnumber.'.json');
+        $response = $this->keeoConnector->get('/person/'.$stemnumber.'.json');
 
         switch ($response->headers['Status-Code']) {
             case '200':
@@ -110,89 +110,89 @@ class Keeo
                 $result = null;
         }
 
-		return $result;
-	}
+        return $result;
+    }
 
-	/**
-	 * Get a function from Keeo
-	 *
-	 * @return PersonFunction
-	 */
-	public function getFunctions() 
+    /**
+     * Get a function from Keeo
+     *
+     * @return PersonFunction
+     */
+    public function getFunctions()
     {
-		$functions = array();
-		
-		$response = $this->keeoConnector->get('/person/functions.json');
-		$functionsData = json_decode($response->body, true);
+        $functions = array();
 
-		if(isset($functionsData['functions'])) $functionsData = $functionsData['functions'];
-		else throw new InvalidResponseException();
+        $response = $this->keeoConnector->get('/person/functions.json');
+        $functionsData = json_decode($response->body, true);
 
-		foreach($functionsData as $functionData) {
-			$functions[] = new PersonFunction($functionData);
-		}
+        if(isset($functionsData['functions'])) $functionsData = $functionsData['functions'];
+        else throw new InvalidResponseException();
 
-		return $functions;
-	}
+        foreach($functionsData as $functionData) {
+            $functions[] = new PersonFunction($functionData);
+        }
 
-	/**
-	 * Checks if a user exists with the given attributes
-	 *
-	 * @param string $firstName
-	 * @param string $name
-	 * @param string $email
-	 * @param DateTime $birthDate
-	 * @return array
-	 * @throws InvalidArgumentException
-	 */
-	public function findUser($firstName = '', $name = '', $email = '', DateTime $birthDate = null)
+        return $functions;
+    }
+
+    /**
+     * Checks if a user exists with the given attributes
+     *
+     * @param string $firstName
+     * @param string $name
+     * @param string $email
+     * @param DateTime $birthDate
+     * @return array
+     * @throws InvalidArgumentException
+     */
+    public function findUser($firstName = '', $name = '', $email = '', DateTime $birthDate = null)
     {
-		$foundUsers = array();
+        $foundUsers = array();
 
-		// build search params
-		$searchParams = array();
-		if(!empty($firstName)){
-			$searchParams['first_name'] = $firstName;
-		}
-		if(!empty($name)){
-			$searchParams['name'] = $name;
-		}
-		if(!empty($email)){
-			$searchParams['email'] = $email;
-		}
-		if(!empty($birthDate)){
-			$searchParams['birth_date'] = $birthDate->format('Y-m-d');
-		}
+        // build search params
+        $searchParams = array();
+        if(!empty($firstName)){
+            $searchParams['first_name'] = $firstName;
+        }
+        if(!empty($name)){
+            $searchParams['name'] = $name;
+        }
+        if(!empty($email)){
+            $searchParams['email'] = $email;
+        }
+        if(!empty($birthDate)){
+            $searchParams['birth_date'] = $birthDate->format('Y-m-d');
+        }
 
-		if(!empty($searchParams)) {
-			$response = $this->keeoConnector->post('/person/verify.json', $searchParams);
+        if(!empty($searchParams)) {
+            $response = $this->keeoConnector->post('/person/verify.json', $searchParams);
 
-			if($response->headers['Status-Code'] == '200') {
-				$foundUsers = json_decode($response->body, true);
-			}
-		} else {
-			throw new InvalidArgumentException('At least one search parameter needs to be given.');
-		}
+            if($response->headers['Status-Code'] == '200') {
+                $foundUsers = json_decode($response->body, true);
+            }
+        } else {
+            throw new InvalidArgumentException('At least one search parameter needs to be given.');
+        }
 
-		return $foundUsers;
-	}
+        return $foundUsers;
+    }
 
-	/**
-	 * Get a unit from Keeo
-	 *
-	 * @param $unitNumber
-	 * @return Unit
-	 */
-	public function getUnit($unitNumber)
-	{
-		$response = $this->keeoConnector->get('/unit/'.$unitNumber.'.json');
-		$unitData = json_decode($response->body, true);
+    /**
+     * Get a unit from Keeo
+     *
+     * @param $unitNumber
+     * @return Unit
+     */
+    public function getUnit($unitNumber)
+    {
+        $response = $this->keeoConnector->get('/unit/'.$unitNumber.'.json');
+        $unitData = json_decode($response->body, true);
 
-		if(isset($unitData['unit_data'])) $unitData = $unitData['unit_data'];
-		else throw new InvalidResponseException();
+        if(isset($unitData['unit_data'])) $unitData = $unitData['unit_data'];
+        else throw new InvalidResponseException();
 
-		return new Unit($unitData);
-	}
+        return new Unit($unitData);
+    }
 
     /**
      * Get the number of persons in a given unit
@@ -202,7 +202,7 @@ class Keeo
      * @return int
      * @throws InvalidArgumentException
      */
-	public function getNumberOfPersonsInUnit($unit, $function = null)
+    public function getNumberOfPersonsInUnit($unit, $function = null)
     {
         if (is_numeric($unit)) {
             $unitNumber = $unit;
@@ -216,7 +216,7 @@ class Keeo
             'number' => $unitNumber
         );
 
-		if(!empty($function)) {
+        if(!empty($function)) {
             if (is_numeric($function)) {
                 $params['function_number'] = $function;
             } elseif ($function instanceof PersonFunction) {
@@ -226,59 +226,59 @@ class Keeo
             }
         }
 
-		$response = $this->keeoConnector->post('/unit/search-member-count.json', $params);
-		$responseBody = json_decode($response->body, true);
+        $response = $this->keeoConnector->post('/unit/search-member-count.json', $params);
+        $responseBody = json_decode($response->body, true);
 
-		if(isset($responseBody['count'])) {
-			$numberOfPersons = (int) $responseBody['count'];
-		} else {
-			throw new InvalidResponseException("Expected key 'count' not found in the response body");
-		}
+        if(isset($responseBody['count'])) {
+            $numberOfPersons = (int) $responseBody['count'];
+        } else {
+            throw new InvalidResponseException("Expected key 'count' not found in the response body");
+        }
 
-		return $numberOfPersons;
-	}
+        return $numberOfPersons;
+    }
 
-	/**
-	 * Get all members in a unit
-	 *
-	 * @param $unitNumber
-	 * @return Person[]
-	 */
-	public function getAllMembersInUnit($unitNumber)
+    /**
+     * Get all members in a unit
+     *
+     * @param $unitNumber
+     * @return Person[]
+     */
+    public function getAllMembersInUnit($unitNumber)
     {
-		return $this->searchMembersInUnit($unitNumber);
-	}
+        return $this->searchMembersInUnit($unitNumber);
+    }
 
-	/**
-	 * @param $unitNumber
-	 * @param string $functionNumber
-	 * @return Person[]
-	 * @throws InvalidResponseException
-	 */
-	public function searchMembersInUnit($unitNumber, $functionNumber = null)
+    /**
+     * @param $unitNumber
+     * @param string $functionNumber
+     * @return Person[]
+     * @throws InvalidResponseException
+     */
+    public function searchMembersInUnit($unitNumber, $functionNumber = null)
     {
         $members = array();
 
-		$params = array(
-			'number' => $unitNumber
-		);
-		if(!empty($functionNumber)) $params['function_number'] = $functionNumber;
+        $params = array(
+            'number' => $unitNumber
+        );
+        if(!empty($functionNumber)) $params['function_number'] = $functionNumber;
 
-		$response = $this->keeoConnector->get('/unit/search-members.json', $params);
-		$membersData = json_decode($response->body, true);
+        $response = $this->keeoConnector->get('/unit/search-members.json', $params);
+        $membersData = json_decode($response->body, true);
 
-		if(isset($membersData['unit_members'])) {
-			$membersData = $membersData['unit_members'];
-		} else {
-			throw new InvalidResponseException();
-		}
+        if(isset($membersData['unit_members'])) {
+            $membersData = $membersData['unit_members'];
+        } else {
+            throw new InvalidResponseException();
+        }
 
-		foreach($membersData as $memberData) {
-			$members[] = new Person($memberData);
-		}
+        foreach($membersData as $memberData) {
+            $members[] = new Person($memberData);
+        }
 
-		return $members;
-	}
+        return $members;
+    }
 
     /**
      * Get all unit categories
@@ -291,10 +291,10 @@ class Keeo
      *      )
      * )
      */
-	public function getUnitCategories()
+    public function getUnitCategories()
     {
-		$response = $this->keeoConnector->get('/unit/categories.json');
-		$categories = json_decode($response->body, true);
+        $response = $this->keeoConnector->get('/unit/categories.json');
+        $categories = json_decode($response->body, true);
 
         if(isset($categories['structure'])) {
             $categories = $categories['structure'];
@@ -302,58 +302,58 @@ class Keeo
             throw new InvalidResponseException();
         }
 
-		return $categories;
-	}
+        return $categories;
+    }
 
-	/**
-	 * Get all unitnumbers in Keeo
-	 *
-	 * @return string[]
-	 */
-	public function getAllUnitNumbers()
+    /**
+     * Get all unitnumbers in Keeo
+     *
+     * @return string[]
+     */
+    public function getAllUnitNumbers()
     {
-		return $this->getUnitsNumbersInCategory(1);
-	}
+        return $this->getUnitsNumbersInCategory(1);
+    }
 
-	/**
-	 * Get all unit numbers within a category
-	 *
-	 * @param $categoryId
-	 * @return string[]
-	 * @throws InvalidResponseException
-	 */
-	public function getUnitsNumbersInCategory($categoryId)
-	{
-		$params = array();
-		if(!empty($categoryId)) $params['category_id'] = $categoryId;
-
-		$response = $this->keeoConnector->get('/unit/select-by-category-id.json', array(
-			'category_id' => $categoryId
-		));
-		$unitData = json_decode($response->body, true);
-
-		if(isset($unitData['unit_numbers'])) {
-			$unitNumbers = $unitData['unit_numbers'];
-		} else {
-			throw new InvalidResponseException();
-		}
-
-		return $unitNumbers;
-	}
-
-
-	/**
-	 * Gets the event categories
-	 *
-	 * @return EventCategory[]
+    /**
+     * Get all unit numbers within a category
+     *
+     * @param $categoryId
+     * @return string[]
      * @throws InvalidResponseException
-	 */
-	public function getEventCategories()
+     */
+    public function getUnitsNumbersInCategory($categoryId)
+    {
+        $params = array();
+        if(!empty($categoryId)) $params['category_id'] = $categoryId;
+
+        $response = $this->keeoConnector->get('/unit/select-by-category-id.json', array(
+            'category_id' => $categoryId
+        ));
+        $unitData = json_decode($response->body, true);
+
+        if(isset($unitData['unit_numbers'])) {
+            $unitNumbers = $unitData['unit_numbers'];
+        } else {
+            throw new InvalidResponseException();
+        }
+
+        return $unitNumbers;
+    }
+
+
+    /**
+     * Gets the event categories
+     *
+     * @return EventCategory[]
+     * @throws InvalidResponseException
+     */
+    public function getEventCategories()
     {
         $categories = array();
 
-		$response = $this->keeoConnector->get('/event/categories.json');
-		$categoriesData = json_decode($response->body, true);
+        $response = $this->keeoConnector->get('/event/categories.json');
+        $categoriesData = json_decode($response->body, true);
 
         if(isset($categoriesData['event_categories'])) {
             $categoriesData = $categoriesData['event_categories'];
@@ -365,8 +365,8 @@ class Keeo
             $categories[] = new EventCategory($categoryData);
         }
 
-		return $categories;
-	}
+        return $categories;
+    }
 
     /**
      * Searches events based on given parameters

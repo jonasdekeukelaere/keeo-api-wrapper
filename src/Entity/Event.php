@@ -32,7 +32,7 @@ class Event extends Entity
      */
     public function getId()
     {
-        return $this->id;
+      return $this->id;
     }
 
     /**

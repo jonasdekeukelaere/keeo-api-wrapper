@@ -10,9 +10,9 @@ $keeo = new \FOSOpenScouting\Keeo\Keeo($config);
 
 // check credentials
 try {
-	$isLoggedIn = $keeo->userLogin('2014000217', 'test123'); // username, password (unencrypted)
+    $isLoggedIn = $keeo->userLogin('2014000217', 'test123'); // username, password (unencrypted)
 } catch (\FOSOpenScouting\Keeo\Exception\CredentialsDoNotMatchException $e) {
-	// username and/or password are incorrect
+    // username and/or password are incorrect
 }
 
 // check if a person exists

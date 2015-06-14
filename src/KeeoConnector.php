@@ -15,15 +15,15 @@ class KeeoConnector extends Curl
     protected $config;
 
     public function __construct(Config $config)
-	{
+    {
         $this->setConfig($config);
 
-		parent::__construct();
+        parent::__construct();
 
-		// verify secure connection
-		$this->options['CURLOPT_SSL_VERIFYPEER'] = 2;
-		$this->options['CURLOPT_SSL_VERIFYHOST'] = 2;
-	}
+        // verify secure connection
+        $this->options['CURLOPT_SSL_VERIFYPEER'] = 2;
+        $this->options['CURLOPT_SSL_VERIFYHOST'] = 2;
+    }
 
     protected function setConfig(Config $config)
     {
@@ -39,14 +39,14 @@ class KeeoConnector extends Curl
      * @return \CurlResponse
      * @throws NotAuthenticatedException
      */
-	function get($url, $vars = array())
-	{
-		$response = parent::get($this->config->getApiUrl() . $url, $vars);
+    function get($url, $vars = array())
+    {
+        $response = parent::get($this->config->getApiUrl() . $url, $vars);
 
         $this->checkResponse($response);
 
         return $response;
-	}
+    }
 
     /**
      * @param string $url
@@ -54,14 +54,14 @@ class KeeoConnector extends Curl
      * @return bool|\CurlResponse
      * @throws NotAuthenticatedException
      */
-	function post($url, $vars = array())
-	{
-		$response = parent::post($this->config->getApiUrl() . $url, $vars);
+    function post($url, $vars = array())
+    {
+        $response = parent::post($this->config->getApiUrl() . $url, $vars);
 
         $this->checkResponse($response);
 
         return $response;
-	}
+    }
 
     /**
      * @param $response
