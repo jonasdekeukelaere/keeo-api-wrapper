@@ -61,7 +61,7 @@ class Keeo
             $json = substr($response->headers['X-Json'], 1, -1);
             $receivedData = json_decode($json, true);
 
-            if(isset($receivedData['result']) && $receivedData['result'] = 'ok' && isset($receivedData['authenticated'])) {
+            if(isset($receivedData['result']) && $receivedData['result'] == 'ok' && isset($receivedData['authenticated'])) {
                 if($receivedData['authenticated']) {
                     if(!isset($receivedData['hash'])) throw new InvalidResponseException();
                     // check the hash
